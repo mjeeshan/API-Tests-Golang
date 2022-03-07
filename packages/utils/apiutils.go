@@ -3,9 +3,14 @@ import (
 	"github.com/go-resty/resty/v2"
 
 );
-func PerformGetRequestWIthQueryString(client *resty.Client) (*resty.Response, error) {
+func PerformGetRequest(client *resty.Client) (*resty.Response, error) {
 	return client.R(). EnableTrace().
     Get("https://reqres.in/api/users")
+}
 
 
+func PerformGetRequestWithQueyParams(client *resty.Client, params string, headers map[string][]string) (*resty.Response, error) {
+	return client.R(). EnableTrace().
+	SetQueryString(params).SetHeaderMultiValues(headers).
+    Get("https://reqres.in/api/users")
 }

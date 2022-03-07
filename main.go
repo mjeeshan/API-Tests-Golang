@@ -7,10 +7,11 @@ import (
 );
 func main()  {
 	client := resty.New()
-	res, _:= utils.PerformGetRequestWIthQueryString(client)
+	res, _:= utils.PerformGetRequest(client)
 	if res.StatusCode() != 200 {
 		 fmt.Println("Response status  is not ok")
    }
+   defer res.RawBody().Close();
    type Data struct {
 	ID int `json:"id"`
 	Email string `json:"email"`
@@ -26,6 +27,26 @@ func main()  {
    }
    users := UserResponse{}
    json.Unmarshal(res.Body(), &users)
+   fmt.Printf("Page is %v, entries per page are %v, total pages are %v\n", users.Page, users.PerPage, users.TotalPages)
+
+   for _, user := range users.Data {
+	fmt.Printf("First name is %v. last name is %v, email is %v, and ID is %v\n", user.FirstName, user.LastName, user.Email, user.ID)
+   }
+
+   // creating header map
+   headersMap := map[string][]string{
+	"Accept": []string{
+		"application/json"},
+   };
+   resp, _ := utils.PerformGetRequestWithQueyParams(client, "page=2", headersMap);
+
+	if resp.StatusCode() != 200 {
+		 fmt.Println("Response status  is not ok")
+   }
+   defer resp.RawBody().Close();
+   fmt.Println(resp.StatusCode())
+
+   json.Unmarshal(resp.Body(), &users)
    fmt.Printf("Page is %v, entries per page are %v, total pages are %v\n", users.Page, users.PerPage, users.TotalPages)
 
    for _, user := range users.Data {
