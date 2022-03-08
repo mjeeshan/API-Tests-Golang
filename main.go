@@ -67,7 +67,9 @@ func main()  {
   defer userResp.RawBody().Close();
 
   newUser := NewUser{}
-  json.Unmarshal(userResp.Body(), &newUser)
+  if err := json.Unmarshal(userResp.Body(), &newUser); err != nil {
+	log.Panic(err)
+}
   fmt.Println(newUser.Id, newUser.CreatedAt)
 
 }
