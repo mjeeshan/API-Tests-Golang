@@ -1,10 +1,17 @@
 package main
 import (
+	"log"
+	"io/ioutil"
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"golearnings/packages/utils"
 	"encoding/json"
 );
+
+type NewUser struct {
+	Id string `json:"id"`
+	CreatedAt string `json:"createdAt"`
+}
 func main()  {
 	client := resty.New()
 	res, _:= utils.PerformGetRequest(client)
@@ -52,7 +59,29 @@ func main()  {
    for _, user := range users.Data {
 	fmt.Printf("First name is %v. last name is %v, email is %v, and ID is %v\n", user.FirstName, user.LastName, user.Email, user.ID)
    }
+
+  userResp, err := utils.PerformPostRequest(client, ReadFileAsString(), headersMap);
+  if err != nil {
+	  log.Panic(err)
+  }
+  defer userResp.RawBody().Close();
+
+  newUser := NewUser{}
+  json.Unmarshal(userResp.Body(), &newUser)
+  fmt.Println(newUser.Id, newUser.CreatedAt)
+
 }
+
+func ReadFileAsString() string {
+	data, err := ioutil.ReadFile("./resources/request.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return string(data)
+}
+
+
+
 
 
 
